@@ -22,4 +22,6 @@ $router->get('/', function () use ($router) {
 
 $router->get('/', 'LoginController@verLogin'); 
 $router->post('/login', 'LoginController@login');
+$router->get('/logout', 'LoginController@cerrar_sesion');
 $router->get('/principal', 'NoticiaController@principal'); 
+$router->get('/admin/noticias', 'NoticiaController@noticias'); 

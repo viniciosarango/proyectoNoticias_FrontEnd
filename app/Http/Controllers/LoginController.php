@@ -72,4 +72,9 @@ class LoginController extends Controller
     public function tests(){
         echo "Hoola";
     }
+
+    public function cerrar_sesion(){
+        session_destroy();
+        return redirect('/');
+    }
 }
