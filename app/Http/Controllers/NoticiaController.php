@@ -23,7 +23,7 @@ class NoticiaController extends Controller
     
         try{
     
-            $response = $client->request('GET', $this->URL."/admin/noticias", );    
+            $response = $client->request('GET', $this->URL."/admin/noticias");    
             $data = json_decode($response -> getBody());
             return view ('fragmentos/principal', ['mensaje' => "", 'base_url' => $this -> BASE_URL, 'noticias'=>$data->data]);
     
@@ -99,6 +99,72 @@ class NoticiaController extends Controller
 
         
     }
+
+    public function view_editar (Request $request, $external){                
+        $client = new \GuzzleHttp\Client();
+        try{
+    
+            $response = $client->request('GET', $this->URL."/admin/noticias/".$external);    
+            $data = json_decode($response -> getBody());
+            return view ('fragmentos/modNoticia', ['mensaje' => "", 'base_url' => $this -> BASE_URL, 'noticias'=>$data->data]);
+    
+            
+    
+        } 
+        catch(\GuzzleHttp\Exception\ClientException $th){
+            return view ('admin/noticias');
+        }
+        //return view ('fragmentos/regNoticia', ['mensaje' => "", 'base_url' => $this -> BASE_URL]);        
+    }
+
+    public function modificar(Request $request){
+        $titulo = $request->input('titulo');
+        $cuerpo = $request->input('cuerpo');
+        $external = $request->input('external');
+
+        $client = new \GuzzleHttp\Client();
+
+        try{
+
+            $sesion = $_SESSION["user"];
+
+            $response = $client->request('POST', $this->URL."/admin/noticias/actualizar", [
+                "json" => [
+                    "titulo" => $titulo,
+                    "cuerpo" => $cuerpo,                    
+                    "external_noticia" => $external
+                ], 'headers'=>['api-token'=>$sesion->token]
+            ]);
+
+            $data = json_decode($response -> getBody());
+
+            if($response -> getStatusCode() == 200){                
+                return redirect('/admin/noticias');                
+            }             
+
+        } catch(\GuzzleHttp\Exception\ClientException $th){
+            if($th -> hasResponse()){
+                $dataE = $th->getResponse();
+                $dataError = json_decode($dataE -> getBody());
+                if(is_string($dataError->data)){
+                    return view('fragmentos/modNoticia', ['mensaje' => $dataError->data, 'base_url' => $this -> BASE_URL]);
+                } else{
+                    $data = $dataError->data->errors;
+                    $aux="";
+                    foreach($data as $e){
+                        $aux = $aux.$e->msg."\n";
+                    }
+                    return view('fragmentos/modNoticia', ['mensaje' => $aux, 'base_url' => $this -> BASE_URL]);
+                }
+            } else {
+                return view('fragmentos/modNoticia', ['mensaje' => $dataError->data, 'base_url' => $this -> BASE_URL]);
+            }
+        }
+
+        
+    }
+
+
 }
 
 

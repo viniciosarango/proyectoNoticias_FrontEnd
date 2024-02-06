@@ -24,7 +24,7 @@
                                     <td>{{$loop -> iteration}}</td>
                                     <td>{{$item->titulo}}</td>
                                     <td>{{$item->fecha}}</td>
-                                    <td>#</td>
+                                    <td><a href="{{$base_url}}index.php/admin/noticias/modificar/{{$item -> external}}" class="btn btn-info">Editar noticia</a></td>
                                </tr> 
                             @endforeach
                         </tbody>
